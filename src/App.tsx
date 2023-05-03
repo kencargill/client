@@ -1,26 +1,36 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import User from "./types";
 
 function App() {
+  const [ backendData , setBackendData] = useState<User[]>([]);
+  const [ loading, setLoading ] = useState(true);
+  const [ error, setError ] = useState('');
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch("/api");
+        const json = await res.json();
+        setBackendData(json);
+        setLoading(false);
+      } catch (error) {
+        setError(`${error}`);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, ["/api"])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <>
+      {( backendData.length === 0) ? (
+          <p>loading...</p>
+        ) : (
+          backendData.map((data, i) => ( <p key={i}>{data.name}</p> ))
+        )}
+    </>
+  )
 }
 
-export default App;
+export default App
